@@ -145,34 +145,7 @@ function gameLoop() {
   window.requestAnimationFrame(gameLoop);
 }
 
-/*
-function moveCharacter(deltaX, deltaY, direction) {
-  if (positionX + deltaX > 0 && positionX + SCALED_WIDTH + deltaX < canvas.width) {
-    positionX += deltaX;
-  }
-  if (positionY + deltaY > 0 && positionY + SCALED_HEIGHT + deltaY < canvas.height) {
-    positionY += deltaY;
-  }
-  currentDirection = direction;
-}
-*/
-/*
-function moveCharacter(deltaX, deltaY, direction) {
-  console.log('im hre')
-  console.log(player1.positionX )
-  console.log(player1.positionY )
-  if (player1.positionX + deltaX > 0 && player1.positionX + SCALED_WIDTH + deltaX < canvas.width) {
-    console.log('down x')
-    player1.positionX += deltaX;
 
-  }
-  if (player1.positionY + deltaY > 0 && player1.positionY + SCALED_HEIGHT + deltaY < canvas.height) {
-    console.log('down y')
-    player1.positionY += deltaY;
-  }
-  currentDirection = direction;
-}
-*/
 function moveCharacter(deltaX, deltaY, direction, thePlayer) {
 
   if (thePlayer.positionX + deltaX > 0 && thePlayer.positionX + SCALED_WIDTH + deltaX < canvas.width) {
