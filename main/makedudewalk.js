@@ -30,6 +30,9 @@ function Player(scale,movementSpeed,startingPositionX,startingPositionY) {
   this.movementSpeed = movementSpeed;
   this.positionX = startingPositionX;
   this.positionY = startingPositionY;
+  this.currentLoopIndex = 0;
+  this.hasMoved = false;
+  this.currentDirection = FACING_DOWN;
 }
 
 
@@ -63,27 +66,28 @@ loadImage();
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  let hasMoved = false;
+  player1.hasMoved = false;
+  player2.hasMoved = false;
   
 
   if (keyPresses.ArrowUp) { //up arrow
     //moveCharacter(0, -MOVEMENT_SPEED, FACING_UP);
     moveCharacter(0, -player1.movementSpeed, FACING_UP, player1);
-    hasMoved = true;
+    player1.hasMoved = true;
   } else if (keyPresses.ArrowDown) { //down arrow
     //moveCharacter(0, MOVEMENT_SPEED, FACING_DOWN);
     moveCharacter(0, player1.movementSpeed, FACING_DOWN, player1);
-    hasMoved = true;
+    player1.hasMoved = true;
   }
 
   if (keyPresses['8']) { //up arrow
     //moveCharacter(0, -MOVEMENT_SPEED, FACING_UP);
     moveCharacter(0, -player2.movementSpeed, FACING_UP, player2);
-    hasMoved = true;
+    player2.hasMoved = true;
   } else if (keyPresses['2']) { //down arrow
     //moveCharacter(0, MOVEMENT_SPEED, FACING_DOWN);
     moveCharacter(0, player2.movementSpeed, FACING_DOWN, player2);
-    hasMoved = true;
+    player2.hasMoved = true;
   }
 
 
@@ -91,40 +95,53 @@ function gameLoop() {
   if (keyPresses.ArrowLeft) {
     //moveCharacter(-MOVEMENT_SPEED, 0, FACING_LEFT);
     moveCharacter(-player1.movementSpeed, 0, FACING_LEFT, player1);
-    hasMoved = true;
+    player1.hasMoved = true;
   } else if (keyPresses.ArrowRight) {
     //moveCharacter(MOVEMENT_SPEED, 0, FACING_RIGHT);
     moveCharacter(player1.movementSpeed, 0, FACING_RIGHT,player1);
-    hasMoved = true;
+    player1.hasMoved = true;
   }
 
   if (keyPresses['4']) {
     //moveCharacter(-MOVEMENT_SPEED, 0, FACING_LEFT);
     moveCharacter(-player2.movementSpeed, 0, FACING_LEFT,player2);
-    hasMoved = true;
+    player2.hasMoved = true;
   } else if (keyPresses['6']) {
     //moveCharacter(MOVEMENT_SPEED, 0, FACING_RIGHT);
     moveCharacter(player2.movementSpeed, 0, FACING_RIGHT,player2);
-    hasMoved = true;
+    player2.hasMoved = true;
   }
 
-  if (hasMoved) {
+  if (player1.hasMoved || player2.hasMoved ) {
     frameCount++;
     if (frameCount >= FRAME_LIMIT) {
       frameCount = 0;
-      currentLoopIndex++;
-      if (currentLoopIndex >= CYCLE_LOOP.length) {
-        currentLoopIndex = 0;
+      if(player1.hasMoved ){
+        player1.currentLoopIndex++;
+        if (player1.currentLoopIndex >= CYCLE_LOOP.length) {
+          player1.currentLoopIndex = 0;
+        }
       }
+      if(player2.hasMoved ){
+        player2.currentLoopIndex++;
+        if (player2.currentLoopIndex >= CYCLE_LOOP.length) {
+          player2.currentLoopIndex = 0;
+        }
+      }
+      
     }
   }
   
-  if (!hasMoved) {
-    currentLoopIndex = 0;
+  if (!player1.hasMoved ) {
+    player1.currentLoopIndex = 0;
   }
 
-  drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection, player1.positionX, player1.positionY);
-  drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection, player2.positionX, player2.positionY);
+  if (!player2.hasMoved ) {
+    player2.currentLoopIndex = 0;
+  }
+
+  drawFrame(CYCLE_LOOP[player1.currentLoopIndex], player1.currentDirection, player1.positionX, player1.positionY);
+  drawFrame(CYCLE_LOOP[player2.currentLoopIndex], player2.currentDirection, player2.positionX, player2.positionY);
   window.requestAnimationFrame(gameLoop);
 }
 
@@ -157,17 +174,14 @@ function moveCharacter(deltaX, deltaY, direction) {
 }
 */
 function moveCharacter(deltaX, deltaY, direction, thePlayer) {
-  console.log('im hre')
-  console.log(thePlayer.positionX )
-  console.log(thePlayer.positionY )
+
   if (thePlayer.positionX + deltaX > 0 && thePlayer.positionX + SCALED_WIDTH + deltaX < canvas.width) {
     console.log('down x')
     thePlayer.positionX += deltaX;
 
   }
   if (thePlayer.positionY + deltaY > 0 && thePlayer.positionY + SCALED_HEIGHT + deltaY < canvas.height) {
-    console.log('down y')
     thePlayer.positionY += deltaY;
   }
-  currentDirection = direction;
+  thePlayer.currentDirection = direction;
 }
