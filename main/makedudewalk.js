@@ -70,9 +70,9 @@ function keyUpListener(event) {
 }
 
 function loadImages() {
-  img.src = 'MainGuySpriteSheet.png';
-  imgMushroom.src = 'mush.png'
-  imgExplosion.src = 'Explosion.png'
+  img.src = './images/MainGuySpriteSheet.png';
+  imgMushroom.src = './images/mush.png'
+  imgExplosion.src = './images/Explosion.png'
   img.onload = function() {
     window.requestAnimationFrame(gameLoop);
   };
