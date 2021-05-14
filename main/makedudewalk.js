@@ -12,6 +12,7 @@ const FRAME_LIMIT = 12;
 const MOVEMENT_SPEED = 2;
 const bulletTotal = 0;
 
+
 let canvas = document.querySelector('canvas');
 let ctx = canvas.getContext('2d');
 let keyPresses = {};
@@ -20,9 +21,16 @@ let currentLoopIndex = 0;
 let frameCount = 0;
 let positionX = 0;
 let positionY = 0;
-let img = new Image();
 
+let img = new Image();
 let imgMushroom = new Image();
+let imgExplosion = new Image();
+
+//explosion variables
+let numExpColumns = 12;
+let widthExplosion = 1152;
+let explosionFrame = 0;
+let currentExplosionFrame = 0;
 
 let player1 = new Player(2.5, 2, 0,0);
 let player2 = new Player(2.5, 2, 550,550);
@@ -46,6 +54,7 @@ function Player(scale,movementSpeed,startingPositionX,startingPositionY) {
   this.currentLoopIndex = 0;
   this.hasMoved = false;
   this.currentDirection = FACING_DOWN;
+  this.alive = true;
 }
 
 
@@ -63,6 +72,7 @@ function keyUpListener(event) {
 function loadImages() {
   img.src = 'MainGuySpriteSheet.png';
   imgMushroom.src = 'mush.png'
+  imgExplosion.src = 'Explosion.png'
   img.onload = function() {
     window.requestAnimationFrame(gameLoop);
   };
@@ -189,11 +199,33 @@ function gameLoop() {
   }
  
 
-
-
   movebullet()
-  drawFrame(CYCLE_LOOP[player1.currentLoopIndex], player1.currentDirection, player1.positionX, player1.positionY);
-  drawFrame(CYCLE_LOOP[player2.currentLoopIndex], player2.currentDirection, player2.positionX, player2.positionY);
+  if(player1.alive){
+    drawFrame(CYCLE_LOOP[player1.currentLoopIndex], player1.currentDirection, player1.positionX, player1.positionY);
+  }else{
+    
+    if(!player1.exploded){
+      ctx.drawImage(imgExplosion, (currentExplosionFrame)*96,0, 96, 96, player1.positionX,player1.positionY,96,96);
+      if((String(explosionFrame).substr(String(explosionFrame).length - 1)) == '0'){
+        console.log('here evcer ' + String(explosionFrame))
+      
+      currentExplosionFrame ++;
+      }
+
+
+      explosionFrame ++;
+      if(currentExplosionFrame  > numExpColumns){
+        player1.exploded = true;
+        explosionFrame = 0;
+        currentExplosionFrame = 0;
+      }
+    }
+      
+  }
+  if(player2.alive){
+    
+    drawFrame(CYCLE_LOOP[player2.currentLoopIndex], player2.currentDirection, player2.positionX, player2.positionY);
+  }
 
   //draw the mushrooms
   for (var i = 0; i < mushrooms.length; i++) {
@@ -228,6 +260,14 @@ function drawbullet() {
   }
 }
 
+function eliminatePlayer(playerNumber){
+  if(playerNumber == 1){
+    player1.alive = false
+  }else{
+    player2.alive = false
+  }
+}
+
 function movebullet() {
   const pixelsFromEdge = 22;
   if(bullets){
@@ -258,7 +298,6 @@ function movebullet() {
         }
 
         mushrooms.push(new Mushroom(tempx,tempy))
-        console.log(mushrooms)
 
         bullets.splice(i, 1);
         
