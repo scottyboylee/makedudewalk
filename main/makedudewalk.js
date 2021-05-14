@@ -1,3 +1,5 @@
+const canvasWidth = 1300
+const canvasHeight = 700
 const SCALE = 2.5;
 const WIDTH = 45;
 const HEIGHT = 36;
@@ -11,7 +13,6 @@ const FACING_RIGHT = 1;
 const FRAME_LIMIT = 12;
 const MOVEMENT_SPEED = 2;
 const bulletTotal = 0;
-
 
 let canvas = document.querySelector('canvas');
 let ctx = canvas.getContext('2d');
@@ -33,9 +34,8 @@ let explosionFrame = 0;
 let currentExplosionFrame = 0;
 
 let player1 = new Player(2.5, 2, 0,0);
-let player2 = new Player(2.5, 2, 550,550);
-width = 1300,
-height = 700,
+let player2 = new Player(2.5, 2, canvasWidth-(WIDTH*SCALE),canvasHeight-(HEIGHT*SCALE));
+
 
 //arrays to store game element objects
 bullets = [];
@@ -112,8 +112,6 @@ function gameLoop() {
     moveCharacter(0, player2.movementSpeed, FACING_DOWN, player2);
     player2.hasMoved = true;
   }
-
-
 
   if (keyPresses.ArrowLeft) {
     //moveCharacter(-MOVEMENT_SPEED, 0, FACING_LEFT);
@@ -200,31 +198,31 @@ function gameLoop() {
  
 
   movebullet()
-  if(player1.alive){
-    drawFrame(CYCLE_LOOP[player1.currentLoopIndex], player1.currentDirection, player1.positionX, player1.positionY);
+
+  if(player2.alive){
+    drawFrame(CYCLE_LOOP[player2.currentLoopIndex], player2.currentDirection, player2.positionX, player2.positionY);
   }else{
     
-    if(!player1.exploded){
-      ctx.drawImage(imgExplosion, (currentExplosionFrame)*96,0, 96, 96, player1.positionX,player1.positionY,96,96);
+    //if(!player2.exploded){
+      ctx.drawImage(imgExplosion, (currentExplosionFrame)*96,0, 96, 96, player2.positionX,player2.positionY,96,96);
       if((String(explosionFrame).substr(String(explosionFrame).length - 1)) == '0'){
-        console.log('here evcer ' + String(explosionFrame))
-      
-      currentExplosionFrame ++;
+        currentExplosionFrame ++;
       }
-
-
       explosionFrame ++;
       if(currentExplosionFrame  > numExpColumns){
-        player1.exploded = true;
+        //player2.exploded = true;
         explosionFrame = 0;
         currentExplosionFrame = 0;
+
+        player2.positionX = canvasWidth-(WIDTH*SCALE);
+        player2.positionY = canvasHeight-(HEIGHT*SCALE);
+        player2.alive = true
       }
-    }
-      
+    //}
   }
-  if(player2.alive){
-    
-    drawFrame(CYCLE_LOOP[player2.currentLoopIndex], player2.currentDirection, player2.positionX, player2.positionY);
+
+  if(player1.alive){
+    drawFrame(CYCLE_LOOP[player1.currentLoopIndex], player1.currentDirection, player1.positionX, player1.positionY);
   }
 
   //draw the mushrooms
@@ -276,25 +274,25 @@ function movebullet() {
       bullets[i].y += bullets[i].speedY;
       let tempx
       let tempy
-      if(bullets[i].x < 0 || bullets[i].x > width ||
-        bullets[i].y < 0 || bullets[i].y > height){
+      if(bullets[i].x < 0 || bullets[i].x > canvasWidth ||
+        bullets[i].y < 0 || bullets[i].y > canvasHeight){
         //bullet has got to end of screen 
         //drop a mushroom location
         if(bullets[i].x < 0){
           tempx = 0
           tempy = bullets[i].y 
         }else 
-        if(bullets[i].x > width) {
-          tempx = width - pixelsFromEdge
+        if(bullets[i].x > canvasWidth) {
+          tempx = canvasWidth - pixelsFromEdge
           tempy = bullets[i].y 
         }else
         if(bullets[i].y < 0 ) {
           tempx = bullets[i].x 
           tempy = 0
         }else
-        if(bullets[i].y > height) {
+        if(bullets[i].y > canvasHeight) {
           tempx = bullets[i].x 
-          tempy = height-pixelsFromEdge
+          tempy = canvasHeight-pixelsFromEdge
         }
 
         mushrooms.push(new Mushroom(tempx,tempy))
@@ -302,6 +300,27 @@ function movebullet() {
         bullets.splice(i, 1);
         
         
+      } else {
+        //Check if bullet has hit a player.
+        //For now only checking if hit player 2.
+        bulletx = bullets[i].x
+        bullety = bullets[i].y
+
+        xFrom = player2.positionX
+        xTo = xFrom + WIDTH
+
+        yFrom = player2.positionY
+        yTo = xFrom + HEIGHT
+
+        if( bulletx > xFrom && bulletx < xTo
+            && bullety > yFrom && bullety < yTo   ){
+
+              //bullet just hit player
+              player2.alive = false
+              bullets.splice(i, 1);
+
+        }
+
       }
     }
   }
